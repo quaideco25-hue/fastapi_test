@@ -2,7 +2,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
-
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Autoriser toutes les origines
+    allow_methods=["*"],  # Autoriser toutes les méthodes HTTP
+    allow_headers=["*"],  # Autoriser tous les en-têtes
+)
 # definir le modèle de données pour les requêtes
 class student(BaseModel):
     id: int
@@ -45,4 +51,5 @@ def delete_student(student_id: int):
         if student.id == student_id:
             students.remove(student)
             return {"message": "Etudiant supprimé avec succès"}
+
     return {"message": "Etudiant non trouvé"}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Gestion École</title>
+<style>
+body { font-family: Arial; margin: 40px; }
+table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+th { background: #f4f4f4; }
+button { padding: 5px 10px; margin: 2px; cursor: pointer; }
+form { margin-bottom: 20px; }
+input { padding: 5px; margin: 5px; }
+</style>
+</head>
+<body>
+
+<h2>Gestion des Étudiants</h2>
+
+<form id="studentForm">
+    <input type="number" id="id" placeholder="ID" required>
+    <input type="text" id="name" placeholder="Nom" required>
+    <input type="number" id="grade" placeholder="Note" required>
+    <button type="submit">Enregistrer</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Note</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="studentTable"></tbody>
+</table>
+
+<script>
+const API_URL = "https://fastapi-test-1-9g9a.onrender.com/students";
+let editMode = false;
+
+async function fetchStudents() {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const table = document.getElementById("studentTable");
+    table.innerHTML = "";
+
+    data.forEach(student => {
+        table.innerHTML += `
+        <tr>
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.grade}</td>
+            <td>
+                <button onclick="editStudent(${student.id}, '${student.name}', ${student.grade})">Modifier</button>
+                <button onclick="deleteStudent(${student.id})">Supprimer</button>
+            </td>
+        </tr>`;
+    });
+}
+
+async function addStudent(student) {
+    await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(student)
+    });
+}
+
+async function updateStudent(id, student) {
+    await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(student)
+    });
+}
+
+async function deleteStudent(id) {
+    await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+    });
+    fetchStudents();
+}
+
+function editStudent(id, name, grade) {
+    document.getElementById("id").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("grade").value = grade;
+    editMode = true;
+}
+
+document.getElementById("studentForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const student = {
+        id: parseInt(document.getElementById("id").value),
+        name: document.getElementById("name").value,
+        grade: parseInt(document.getElementById("grade").value)
+    };
+
+    if (editMode) {
+        await updateStudent(student.id, student);
+        editMode = false;
+    } else {
+        await addStudent(student);
+    }
+
+    this.reset();
+    fetchStudents();
+});
+
+fetchStudents();
+</script>
+
+</body>
+</html>

@@ -9,6 +9,12 @@ app.add_middleware(
     allow_methods=["*"],  # Autoriser toutes les méthodes HTTP
     allow_headers=["*"],  # Autoriser tous les en-têtes
 )
+
+# Root route returns the GUI.html file
+@app.get("/")
+def root():
+    return FileResponse("GUI.html")
+# definir le modèle de données pour les requêtes
 # definir le modèle de données pour les requêtes
 class student(BaseModel):
     id: int
@@ -53,3 +59,4 @@ def delete_student(student_id: int):
             return {"message": "Etudiant supprimé avec succès"}
 
     return {"message": "Etudiant non trouvé"}
+

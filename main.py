@@ -14,7 +14,7 @@ app.add_middleware(
 @app.get("/")
 def root():
     return FileResponse("GUI.html")
-# definir le modèle de données pour les requêtes
+
 # definir le modèle de données pour les requêtes
 class student(BaseModel):
     id: int
@@ -59,4 +59,5 @@ def delete_student(student_id: int):
             return {"message": "Etudiant supprimé avec succès"}
 
     return {"message": "Etudiant non trouvé"}
+
 
